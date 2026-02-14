@@ -1,7 +1,7 @@
 # 请在下方输入自定义命令(一般用来安装第三方插件)(可以留空)
 
 # 编辑默认的lan口ip地址
-sed -i 's/192.168.1.1/192.168.1.2/g' package/base-files/files/bin/config_generate
+#sed -i 's/192.168.1.1/192.168.1.2/g' package/base-files/files/bin/config_generate
 
 # 编辑默认的主题
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
@@ -17,4 +17,10 @@ echo 'src-git UA3F https://github.com/SunBK201/UA3F.git' >>feeds.conf.default
 #git clone https://github.com/kenzok8/openwrt-packages.git package/openwrt-packages
 #git clone https://github.com/kenzok8/small.git package/small
 #git clone https://github.com/SunBK201/UA3F.git package/UA3F
+#git clone https://github.com/stevenjoezhang/luci-app-adguardhome.git package/ADGH
+git clone https://github.com/chenmozhijin/turboacc.git package/turboacc
 git clone https://github.com/stevenjoezhang/luci-app-adguardhome.git package/ADGH
+git clone https://github.com/buwentian1/istore.git package/istore
+git clone https://github.com/sirpdboy/luci-app-netspeedtest.git package/netspeedtest
+git clone https://github.com/immortalwrt/Rclone-OpenWrt.git package/Rclone
+git clone https://github.com/ntlf9t/luci-app-easymesh.git package/easymesh
