@@ -133,12 +133,11 @@ jobs:
 
       - name: 使用 ssh 连接编译环境 (upterm)
         if: ${{ inputs.ssh == true }}
-        uses: owenthereal/action-upterm@v1       
+        uses: owenthereal/action-upterm@v1
         timeout-minutes: 60
         continue-on-error: true
         with:
-          limit-access-to-actor: true
-          wait-timeout-minutes: 15
+          limit-access-to-actor: false
 
       - name: 启用ssh生成了.config后在编译前上传配置(Upload config before build)
         if: ${{inputs.ssh == true}}
