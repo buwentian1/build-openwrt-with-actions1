@@ -131,53 +131,13 @@ jobs:
           chmod +x diy.sh
           ./diy.sh
 
-      - name: 更新并下载 feeds (Update and download feeds)
-        working-directory: openWRT
-        run: ./scripts/feeds update -a && ./scripts/feeds install -a
-
-      # 1) 自己装 tmate（走 apt，最可控；装不上就明确失败，不会再静默挂）
-      - name: 预装 tmate 并验证可用
+      - name: 使用 ssh 连接编译环境 (upterm)
         if: ${{ inputs.ssh == true }}
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends tmate || {
-            echo "!! apt 装不上 tmate，改用官方静态二进制"; 
-            curl -fsSL --connect-timeout 20 --max-time 180 \
-              -o /tmp/tmate.tgz \
-              https://github.com/tmate-io/tmate/releases/download/2.4.0/tmate-2.4.0-static-linux-amd64.tar.xz || \
-              echo "!! 连 github releases 也失败（这就是卡住的原因）";
-          }
-          command -v tmate && tmate -V
-          /usr/bin/timeout 30 tmate -S /tmp/probe.sock new-session -d \
-            && echo ">>> 二进制正常，会话能建立" \
-            || echo ">>> !! tmate 无法建立会话（退出码 $?）"
-          /usr/bin/timeout 20 tmate -S /tmp/probe.sock display -p '#{tmate_web}' 2>&1 || true
-          tmate -S /tmp/probe.sock kill-server 2>/dev/null || true
-          rm -f /tmp/probe.sock
-
-      # 2) 网络自检（区分"出网被封"还是"环境坏了"）
-      - name: tmate 出网自检
-        if: ${{ inputs.ssh == true }}
-        run: |
-          for h in tmate.io nyc1.tmate.io; do getent hosts $h || echo "!! DNS 失败 $h"; done
-          for h in tmate.io nyc1.tmate.io; do
-            /usr/bin/timeout 8 bash -c "cat </dev/null >/dev/tcp/$h/22" \
-              && echo "OK $h:22" || echo "!! $h:22 不通"
-          done
-          curl -sS -o /dev/null -w "api.github.com %{http_code}\n" --max-time 15 \
-            -H "Authorization: Bearer ${{ github.token }}" https://api.github.com/user/keys || echo "!! GitHub API 不通"
-
-      # 3) 正式连接：跳过安装，直接把等待时间砍短，失败也快速暴露
-      - name: 使用ssh连接编译环境
-        if: ${{ inputs.ssh == true }}
-        uses: mxschmitt/action-tmate@v3
+        uses: owent-utils/action-upterm@v1
         timeout-minutes: 60
         continue-on-error: true
         with:
-          install-dependencies: false     # ★ 已经装好了，跳过它那段会挂的下载
-          connect-timeout-seconds: 120    # ★ 别再用 600 空等；12 分钟连不上就是真连不上
           limit-access-to-actor: true
-          sudo: false
 
       - name: 启用ssh生成了.config后在编译前上传配置(Upload config before build)
         if: ${{inputs.ssh == true}}
