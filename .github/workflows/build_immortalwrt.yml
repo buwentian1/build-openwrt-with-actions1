@@ -131,9 +131,9 @@ jobs:
           chmod +x diy.sh
           ./diy.sh
 
-      - name: 使用 ssh 连接编译环境 (upterm)
+      - name: 使用 ssh 连接编译环境 (cloudflared)
         if: ${{ inputs.ssh == true }}
-        uses: owenthereal/action-upterm@v1
+        uses: valeriangalliat/action-sshd-cloudflared@v2
         timeout-minutes: 60
         continue-on-error: true
 
